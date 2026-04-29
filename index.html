@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>晟辉全屋定制 · 产品图册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #262626;
+    --bar: #1c1c1c;
+    --border: rgba(255,255,255,0.08);
+    --gold: #C9A96E;
+    --text: rgba(255,255,255,0.85);
+    --muted: rgba(255,255,255,0.35);
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  }
+
+  /* ── 颗粒噪点层 ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+  }
+
+  /* ── Cover ── */
+  #cover {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity .5s ease, visibility .5s;
+  }
+  #cover.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .cover-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 40px;
+  }
+
+  /* 顶部装饰框角 */
+  .cover-frame {
+    position: relative;
+    padding: 44px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .cover-frame::before,
+  .cover-frame::after,
+  .cover-frame .fc-bl,
+  .cover-frame .fc-br {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+  }
+  .cover-frame::before  { top:0; left:0;  border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+  .cover-frame::after   { top:0; right:0; border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+  .cover-frame .fc-bl   { bottom:0; left:0;  border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+  .cover-frame .fc-br   { bottom:0; right:0; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+  .cover-brand {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 8px;
+    color: var(--text);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .cover-en {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .cover-divider {
+    width: 24px; height: 1px;
+    background: var(--gold);
+    margin-bottom: 24px;
+  }
+  .cover-desc {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-bottom: 36px;
+    text-align: center;
+  }
+  .cover-btn {
+    padding: 12px 40px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 5px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: background .25s, color .25s;
+  }
+  .cover-btn:active { background: var(--gold); color: var(--bg); }
+
+  .cover-phone {
+    margin-top: 40px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  /* ── Viewer ── */
+  #viewer {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top bar */
+  #topbar {
+    flex-shrink: 0;
+    height: 50px;
+    background: var(--bar);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    z-index: 10;
+  }
+  .tb-back {
+    font-size: 11px;
+    color: var(--muted);
+    background: none; border: none;
+    cursor: pointer; letter-spacing: 1px;
+    padding: 6px 0;
+  }
+  .tb-brand {
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    font-weight: 300;
+  }
+  .tb-counter {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    min-width: 52px;
+    text-align: right;
+  }
+
+  /* Slide area */
+  #slide-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+    /* subtle vignette */
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.35);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+    padding: 10px;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  /* Photo frame */
+  .slide-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,0.4),
+      0 12px 40px rgba(0,0,0,0.5),
+      inset 0 0 0 1px rgba(255,255,255,0.03);
+    background: #111;
+    overflow: hidden;
+  }
+
+  .slide-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .img-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a1a;
+  }
+  .spinner {
+    width: 22px; height: 22px;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Bottom bar */
+  #bottombar {
+    flex-shrink: 0;
+    background: var(--bar);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Progress */
+  .progress-track {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width .25s ease;
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 62px;
+  }
+
+  .nav-btn {
+    width: 42px; height: 42px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    flex-shrink: 0;
+  }
+  .nav-btn:active { background: rgba(201,169,110,0.15); border-color: var(--gold); }
+  .nav-btn:disabled { opacity: .2; pointer-events: none; }
+  .nav-btn svg { width: 16px; height: 16px; }
+
+  .nav-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .nav-page {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .nav-total {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Cover -->
+<div id="cover">
+  <div class="cover-inner">
+    <div class="cover-frame">
+      <div class="fc-bl"></div>
+      <div class="fc-br"></div>
+      <div class="cover-brand">晟辉全屋定制</div>
+      <div class="cover-en">SHENGHUI CUSTOM HOME</div>
+      <div class="cover-divider"></div>
+      <div class="cover-desc">产品实景图册 · 238张</div>
+      <button class="cover-btn" onclick="startViewer()">开 始 浏 览</button>
+    </div>
+    <div class="cover-phone">136 · 7362 · 8456</div>
+  </div>
+</div>
+
+<!-- Viewer -->
+<div id="viewer">
+  <div id="topbar">
+    <button class="tb-back" onclick="showCover()">← 封面</button>
+    <div class="tb-brand">晟辉</div>
+    <div class="tb-counter" id="counter">1 / 238</div>
+  </div>
+
+  <div id="slide-wrap"></div>
+
+  <div id="bottombar">
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0.42%"></div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" id="btn-prev" onclick="prev()" disabled>
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M10 3L5 8L10 13" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-center">
+        <div class="nav-page" id="nav-page">1</div>
+        <div class="nav-total">/ 238</div>
+      </div>
+      <button class="nav-btn" id="btn-next" onclick="next()">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M6 3L11 8L6 13" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FOLDER = 'photos/';
+const images = [
+  'KH0A8147.JPG','KH0A8149.JPG','KH0A8160.JPG','KH0A8161.JPG','KH0A8164.JPG',
+  'KH0A8166.JPG','KH0A8167.JPG','KH0A8168.JPG','KH0A8169.JPG','KH0A8170.JPG',
+  'KH0A8171.JPG','KH0A8172.JPG','KH0A8173.JPG','KH0A8174.JPG','KH0A8175.JPG',
+  'KH0A8176.JPG','KH0A8177.JPG','KH0A8178.JPG','KH0A8179.JPG','KH0A8180.JPG',
+  'KH0A8181.JPG','KH0A8182.JPG','KH0A8183.JPG','KH0A8184.JPG','KH0A8185.JPG',
+  'KH0A8186.JPG','KH0A8187.JPG','KH0A8188.JPG','KH0A8189.JPG','KH0A8190.JPG',
+  'KH0A8191.JPG','KH0A8192.JPG','KH0A8193.JPG','KH0A8194.JPG','KH0A8195.JPG',
+  'KH0A8196.JPG','KH0A8197.JPG','KH0A8198.JPG','KH0A8199.JPG','KH0A8200.JPG',
+  'KH0A8201.JPG','KH0A8202.JPG','KH0A8203.JPG','KH0A8204.JPG','KH0A8205.JPG',
+  'KH0A8206.JPG','KH0A8207.JPG','KH0A8208.JPG','KH0A8209.JPG','KH0A8210.JPG',
+  'KH0A8211.JPG','KH0A8212.JPG','KH0A8213.JPG','KH0A8214.JPG','KH0A8215.JPG',
+  'KH0A8216.JPG','KH0A8217.JPG','KH0A8218.JPG','KH0A8219.JPG','KH0A8220.JPG',
+  'KH0A8221.JPG','KH0A8222.JPG','KH0A8223.JPG','KH0A8224.JPG','KH0A8225.JPG',
+  'KH0A8226.JPG','KH0A8227.JPG','KH0A8228.JPG','KH0A8229.JPG','KH0A8230.JPG',
+  'KH0A8231.JPG','KH0A8232.JPG','KH0A8233.JPG','KH0A8234.JPG','KH0A8235.JPG',
+  'KH0A8236.JPG','KH0A8237.JPG','KH0A8239.JPG','KH0A8240.JPG','KH0A8241.JPG',
+  'KH0A8242.JPG','KH0A8243.JPG','KH0A8244.JPG','KH0A8245.JPG','KH0A8246.JPG',
+  'KH0A8247.JPG','KH0A8248.JPG','KH0A8249.JPG','KH0A8250.JPG','KH0A8251.JPG',
+  'KH0A8252.JPG','KH0A8253.JPG','KH0A8254.JPG','KH0A8255.JPG','KH0A8256.JPG',
+  'KH0A8257.JPG','KH0A8258.JPG','KH0A8259.JPG','KH0A8260.JPG','KH0A8261.JPG',
+  'KH0A8262.JPG','KH0A8263.JPG','KH0A8264.JPG','KH0A8265.JPG','KH0A8266.JPG',
+  'KH0A8267.JPG','KH0A8268.JPG','KH0A8269.JPG','KH0A8270.JPG','KH0A8271.JPG',
+  'KH0A8272.JPG','KH0A8273.JPG','KH0A8274.JPG','KH0A8275.JPG','KH0A8276.JPG',
+  'KH0A8277.JPG','KH0A8278.JPG','KH0A8279.JPG','KH0A8280.JPG','KH0A8281.JPG',
+  'KH0A8282.JPG','KH0A8283.JPG','KH0A8284.JPG','KH0A8285.JPG','KH0A8286.JPG',
+  'KH0A8287.JPG','KH0A8288.JPG','KH0A8289.JPG','KH0A8290.JPG','KH0A8291.JPG',
+  'KH0A8292.JPG','KH0A8293.JPG','KH0A8294.JPG','KH0A8295.JPG','KH0A8296.JPG',
+  'KH0A8297.JPG','KH0A8298.JPG','KH0A8299.JPG','KH0A8300.JPG','KH0A8301.JPG',
+  'KH0A8302.JPG','KH0A8303.JPG','KH0A8304.JPG','KH0A8305.JPG','KH0A8306.JPG',
+  'KH0A8307.JPG','KH0A8308.JPG','KH0A8309.JPG','KH0A8310.JPG','KH0A8311.JPG',
+  'KH0A8312.JPG','KH0A8313.JPG','KH0A8314.JPG','KH0A8315.JPG','KH0A8316.JPG',
+  'KH0A8317.JPG','KH0A8318.JPG','KH0A8319.JPG','KH0A8320.JPG','KH0A8321.JPG',
+  'KH0A8322.JPG','KH0A8323.JPG','KH0A8324.JPG','KH0A8325.JPG','KH0A8326.JPG',
+  'KH0A8327.JPG','KH0A8328.JPG','KH0A8329.JPG','KH0A8330.JPG','KH0A8331.JPG',
+  'KH0A8332.JPG','KH0A8333.JPG','KH0A8334.JPG','KH0A8335.JPG','KH0A8336.JPG',
+  'KH0A8337.JPG','KH0A8338.JPG','KH0A8339.JPG','KH0A8340.JPG','KH0A8341.JPG',
+  'KH0A8342.JPG','KH0A8343.JPG','KH0A8344.JPG','KH0A8345.JPG','KH0A8346.JPG',
+  'KH0A8351.JPG','KH0A8352.JPG','KH0A8353.JPG','KH0A8354.JPG','KH0A8355.JPG',
+  'KH0A8356.JPG','KH0A8357.JPG','KH0A8360.JPG','KH0A8364.JPG','KH0A8365.JPG',
+  'KH0A8372.JPG','KH0A8374.JPG','KH0A8375.JPG','KH0A8376.JPG','KH0A8377.JPG',
+  'KH0A8378.JPG','KH0A8379.JPG','KH0A8380.JPG','KH0A8381.JPG','KH0A8382.JPG',
+  'KH0A8383.JPG','KH0A8384.JPG','KH0A8385.JPG','KH0A8386.JPG','KH0A8387.JPG',
+  'KH0A8388.JPG','KH0A8403.JPG','KH0A8404.JPG','KH0A8405.JPG','KH0A8406.JPG',
+  'KH0A8408.JPG','KH0A8409.JPG','KH0A8410.JPG','KH0A8412.JPG','KH0A8413.JPG',
+  'KH0A8415.JPG','KH0A8416.JPG','KH0A8417.JPG','KH0A8418.JPG','KH0A8419.JPG',
+  'KH0A8420.JPG','KH0A8422.JPG','KH0A8423.JPG','KH0A8424.JPG','KH0A8425.JPG',
+  'KH0A8435.JPG','KH0A8436.JPG','KH0A8437.JPG','KH0A8438.JPG','KH0A8439.JPG',
+  'KH0A8443.JPG','KH0A8444.JPG','KH0A8445.JPG'
+];
+const TOTAL = images.length;
+let current = 0;
+
+const slideWrap  = document.getElementById('slide-wrap');
+const counter    = document.getElementById('counter');
+const navPage    = document.getElementById('nav-page');
+const progressFill = document.getElementById('progress-fill');
+const btnPrev    = document.getElementById('btn-prev');
+const btnNext    = document.getElementById('btn-next');
+const slideEls   = new Array(TOTAL).fill(null);
+
+function getOrBuildSlide(i) {
+  if (slideEls[i]) return slideEls[i];
+
+  const div = document.createElement('div');
+  div.className = 'slide';
+
+  const frame = document.createElement('div');
+  frame.className = 'slide-frame';
+
+  const loading = document.createElement('div');
+  loading.className = 'img-loading';
+  loading.innerHTML = '<div class="spinner"></div>';
+  frame.appendChild(loading);
+
+  const img = document.createElement('img');
+  img.alt = '';
+  img.draggable = false;
+  img.onload = () => loading.remove();
+  frame.appendChild(img);
+
+  div.appendChild(frame);
+  slideWrap.appendChild(div);
+  slideEls[i] = div;
+  return div;
+}
+
+function loadSlide(i) {
+  if (i < 0 || i >= TOTAL) return;
+  const div = getOrBuildSlide(i);
+  const img = div.querySelector('img');
+  if (!img.src) img.src = FOLDER + images[i];
+}
+
+function goTo(i) {
+  if (i < 0 || i >= TOTAL) return;
+  if (slideEls[current]) slideEls[current].classList.remove('active');
+  current = i;
+  loadSlide(i);
+  loadSlide(i + 1);
+  loadSlide(i + 2);
+  loadSlide(i - 1);
+  getOrBuildSlide(i).classList.add('active');
+  counter.textContent = `${i + 1} / ${TOTAL}`;
+  navPage.textContent = i + 1;
+  progressFill.style.width = ((i + 1) / TOTAL * 100).toFixed(2) + '%';
+  btnPrev.disabled = i === 0;
+  btnNext.disabled = i === TOTAL - 1;
+}
+
+function prev() { goTo(current - 1); }
+function next() { goTo(current + 1); }
+
+function startViewer() {
+  document.getElementById('cover').classList.add('hidden');
+  goTo(0);
+}
+function showCover() {
+  document.getElementById('cover').classList.remove('hidden');
+}
+
+// 左右滑动
+let tx = 0, ty = 0, moved = false;
+slideWrap.addEventListener('touchstart', e => {
+  tx = e.touches[0].clientX;
+  ty = e.touches[0].clientY;
+  moved = false;
+}, { passive: true });
+slideWrap.addEventListener('touchmove', e => {
+  if (Math.abs(e.touches[0].clientX - tx) > 8 || Math.abs(e.touches[0].clientY - ty) > 8) moved = true;
+}, { passive: true });
+slideWrap.addEventListener('touchend', e => {
+  if (!moved) return;
+  const dx = e.changedTouches[0].clientX - tx;
+  const dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) {
+    dx < 0 ? next() : prev();
+  }
+}, { passive: true });
+
+// 键盘
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev();
+});
+</script>
+</body>
+</html>
